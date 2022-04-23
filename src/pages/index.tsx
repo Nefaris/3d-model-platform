@@ -1,15 +1,10 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
-import Head from 'next/head';
 import Layout from '../components/Layout';
 
 const Home: NextPage = () => {
   return (
     <>
-      <Head>
-        <title>3D Trading Platform</title>
-      </Head>
-
       <Layout>
         <section>
           <div className='pt-12 pb-24 2xl:pb-44 bg-blueGray-100'>
