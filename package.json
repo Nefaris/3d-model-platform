@@ -7,12 +7,21 @@
     "build": "next build",
     "export": "next export",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prettier": "prettier --write '**/*.{js,jsx,ts,tsx}'"
   },
   "dependencies": {
+    "@hookform/resolvers": "^2.8.8",
+    "axios": "^0.26.1",
+    "classnames": "^2.3.1",
     "next": "12.1.5",
+    "prettier": "^2.6.2",
     "react": "18.0.0",
-    "react-dom": "18.0.0"
+    "react-dom": "18.0.0",
+    "react-hook-form": "^7.30.0",
+    "react-query": "^3.38.0",
+    "react-toastify": "^8.2.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/node": "17.0.25",

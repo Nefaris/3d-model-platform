@@ -1,6 +1,12 @@
 import type { AppProps } from 'next/app';
-import '../styles/globals.css';
 import Head from 'next/head';
+import AuthProvider from '../providers/AuthProvider';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '../styles/globals.css';
+
+const client = new QueryClient();
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
@@ -9,7 +15,23 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         <title>3D Trading Platform</title>
       </Head>
 
-      <Component {...pageProps} />
+      <QueryClientProvider client={client}>
+        <AuthProvider>
+          <Component {...pageProps} />
+        </AuthProvider>
+      </QueryClientProvider>
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   );
 };

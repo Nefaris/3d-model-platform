@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .disabled {
+    @apply relative opacity-40;
+  }
+
+  .disabled::after {
+    content: "";
+    @apply absolute inset-0 w-full h-full cursor-not-allowed z-10;
+  }
+}
