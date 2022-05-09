@@ -1,22 +1,32 @@
 import axios from 'axios';
-import type { NextPage } from 'next';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import type { InferGetServerSidePropsType, NextPage } from 'next';
+import { useState } from 'react';
 import { useQuery } from 'react-query';
 import Layout from '../components/Layout';
+import ProductCard from '../components/ProductCard';
+import { Product } from '../types/global';
+
+export async function getServerSideProps() {
+  const res = await axios.get<Product[]>('https://trading-platform-3d.herokuapp.com/api/products?page=1', {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYwNzY5NzM4LCJpYXQiOjE2NTIxMjk3MzgsImp0aSI6ImJiZGY0ZDM3OGQ3YzQyNGNhMTUyOGUyNmFmZTg3N2I0IiwidXNlcl9pZCI6Nn0.XsBmQGTMvgaoAN-kZuOEn6SSIJJStVBmBeNQxzCZoyI`,
+    },
+  });
+
+  return {
+    props: { initialProducts: res.data },
+  };
+}
 
 const fetchProducts = async (page: number) => {
   const res = await axios.get(`https://trading-platform-3d.herokuapp.com/api/products?page=${page}`);
   return res.data;
 };
 
-const Home: NextPage = () => {
+const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ initialProducts }) => {
   const [page, setPage] = useState(1);
-  const products = useQuery(['products', { page: page }], () => fetchProducts(page));
-
-  useEffect(() => {
-    console.log(products.data);
-  }, [products.data]);
+  const products = useQuery(['products', { page: page }], () => fetchProducts(page), { initialData: initialProducts });
 
   return (
     <>
@@ -141,296 +151,13 @@ const Home: NextPage = () => {
                   </a>
                 </div>
               </div>
-              <div className="flex flex-wrap -mx-3 mb-20 md:mb-40">
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/iphone-12-pro.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Apple iPhone 12 Pro (128GB) Silver
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>544.90</span>
-                  </p>
+              {products.data && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 mb-20 md:mb-40">
+                  {products.data.results.map((product: Product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
                 </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/headphones-sony.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Headphones SONY 1l X-O
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>44.90</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/macbook-pro-17.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        MacBook Pro 17’’
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>2090.59</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/smartwatch-green.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Smartwatch Uistore Homme Watch 19
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>120.90</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/macbook-pro-15.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        MacBook Pro 15’’ new
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>1780.90</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/smartwatch-yellow.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Xui Smartwatch YW
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>100.90</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/headphones-blacksaint.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Headphones Blacksaint 3
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>42.90</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/smartphone.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Wiko Y51 1GB/16GB 5.45’’ Syrena Lol
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>376.90</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24 xl:mb-0">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/xiaomi-camera.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Kamera Xiaomi Mi Home Security Camera 2K 360°
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>37.90</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24 lg:mb-0">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/smartwatch-green.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Smartwatch Uistore Homme Watch 19
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>120.90</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3 mb-24 sm:mb-0">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover mx-auto"
-                          src="uinel-assets/images/ecommerce-product-list/xiaomi-camera2.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Kamera Xiaomi Mi Home Security Camera 2K Pro 360°
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>29.59</span>
-                  </p>
-                </div>
-                <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-3">
-                  <div className="xl:flex xl:items-center p-10 xl:py-32 mb-8 bg-white rounded-3xl">
-                    <Link href="/product">
-                      <a className="block mx-auto max-w-max">
-                        <img
-                          className="h-40 object-cover"
-                          src="uinel-assets/images/ecommerce-product-list/smartwatch-blue.png"
-                          alt=""
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                  <Link href="/product">
-                    <a href="#">
-                      <p className="mb-4 text-xl leading-8 font-heading font-medium hover:underline">
-                        Xui Smartwatch Pr
-                      </p>
-                    </a>
-                  </Link>
-                  <p className="text-xl text-blue-500 font-heading font-medium tracking-tighter">
-                    <span className="text-base pr-2">$</span>
-                    <span>44.90</span>
-                  </p>
-                </div>
-              </div>
+              )}
               <div className="sm:mx-auto sm:w-96">
                 <a
                   className="block py-5 px-10 w-full text-xl leading-6 text-white font-medium tracking-tighter font-heading text-center bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-xl"
