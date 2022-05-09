@@ -2,12 +2,11 @@ import { NextPage } from 'next';
 import Layout from '../components/Layout';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
-import axios from 'axios';
 import classNames from 'classnames';
-import { toast } from 'react-toastify';
 import { object, SchemaOf, string } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useAuth } from '../providers/AuthProvider';
+import Router from 'next/router';
 
 type FormInputs = {
   email: string;
@@ -20,24 +19,16 @@ const validationSchema: SchemaOf<FormInputs> = object({
 });
 
 const Login: NextPage = () => {
+  const auth = useAuth();
+
   const { register, handleSubmit, formState } = useForm<FormInputs>({
     resolver: yupResolver(validationSchema),
   });
 
-  const loginMutation = useMutation(async (loginData: any) => {
-    const res = await axios.post('https://trading-platform-3d.herokuapp.com/api/auth/token', loginData);
-    return res.data;
-  });
-
-  const submitHandler = (formData: FormInputs) => {
-    if (loginMutation.isLoading) return;
-    loginMutation.mutate(formData, {
-      onSuccess: () => {
-        toast.success('Successfully logged in!');
-      },
-      onError: () => {
-        toast.error('Invalid credentials!');
-      },
+  const submitHandler = async (formData: FormInputs) => {
+    if (formState.isSubmitting) return;
+    return auth.login(formData).then(() => {
+      Router.push('/');
     });
   };
 
@@ -72,7 +63,7 @@ const Login: NextPage = () => {
                 <form
                   noValidate
                   onSubmit={handleSubmit(submitHandler)}
-                  className={classNames(loginMutation.isLoading && 'disabled', 'max-w-md mx-auto')}
+                  className={classNames(formState.isSubmitting && 'disabled', 'max-w-md mx-auto')}
                 >
                   <div className="mb-6">
                     <input
@@ -100,7 +91,7 @@ const Login: NextPage = () => {
 
                   <button
                     type="submit"
-                    disabled={loginMutation.isLoading}
+                    disabled={formState.isSubmitting}
                     className="block py-5 px-10 mx-auto w-full md:max-w-max text-xl leading-6 text-white font-medium tracking-tighter font-heading text-center bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-xl"
                   >
                     Login

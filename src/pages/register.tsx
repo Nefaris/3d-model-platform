@@ -1,45 +1,39 @@
 import { NextPage } from 'next';
 import Link from 'next/link';
+import Router from 'next/router';
 import { useForm } from 'react-hook-form';
 import { object, SchemaOf, string } from 'yup';
 import Layout from '../components/Layout';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useMutation } from 'react-query';
-import axios from 'axios';
 import classNames from 'classnames';
-import { toast } from 'react-toastify';
+import { useAuth } from '../providers/AuthProvider';
 
 type FormInputs = {
   username: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
   password: string;
 };
 
 const validationSchema: SchemaOf<FormInputs> = object({
   username: string().required().min(8).max(32),
   email: string().required().email(),
+  firstName: string().max(32),
+  lastName: string().max(32),
   password: string().required().min(8).max(32),
 });
 
 const Register: NextPage = () => {
+  const auth = useAuth();
   const { register, handleSubmit, formState } = useForm<FormInputs>({
     resolver: yupResolver(validationSchema),
   });
 
-  const registerMutation = useMutation(async (registerData: any) => {
-    const res = await axios.post('https://trading-platform-3d.herokuapp.com/api/auth/register', registerData);
-    return res.data;
-  });
-
-  const submitHandler = (formData: FormInputs) => {
-    if (registerMutation.isLoading) return;
-    registerMutation.mutate(formData, {
-      onSuccess: () => {
-        toast.success('Successfully registered!');
-      },
-      onError: () => {
-        toast.error('Something went wrong!');
-      },
+  const submitHandler = async (formData: FormInputs) => {
+    if (formState.isSubmitting) return;
+    return auth.register(formData).then(() => {
+      Router.push('/');
     });
   };
 
@@ -74,7 +68,7 @@ const Register: NextPage = () => {
                 noValidate
                 onSubmit={handleSubmit(submitHandler)}
                 className={classNames(
-                  registerMutation.isLoading && 'disabled',
+                  formState.isSubmitting && 'disabled',
                   'py-10 px-6 border-2 border-gray-50 rounded-4xl',
                 )}
               >
@@ -106,6 +100,30 @@ const Register: NextPage = () => {
                   <div className="mb-6">
                     <input
                       className="w-full py-5 px-12 text-xl border-2 border-blue-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                      type="text"
+                      placeholder="First name"
+                      {...register('firstName')}
+                    />
+                    {formState.errors.firstName && (
+                      <p className="text-sm text-red-500 ml-4">{formState.errors.firstName.message}</p>
+                    )}
+                  </div>
+
+                  <div className="mb-6">
+                    <input
+                      className="w-full py-5 px-12 text-xl border-2 border-blue-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                      type="text"
+                      placeholder="Last name"
+                      {...register('lastName')}
+                    />
+                    {formState.errors.lastName && (
+                      <p className="text-sm text-red-500 ml-4">{formState.errors.lastName.message}</p>
+                    )}
+                  </div>
+
+                  <div className="mb-6">
+                    <input
+                      className="w-full py-5 px-12 text-xl border-2 border-blue-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                       type="password"
                       placeholder="Password"
                       {...register('password')}
@@ -117,7 +135,7 @@ const Register: NextPage = () => {
 
                   <button
                     type="submit"
-                    disabled={registerMutation.isLoading}
+                    disabled={formState.isSubmitting}
                     className="block py-5 px-10 mx-auto w-full md:max-w-max text-xl leading-6 text-white font-medium tracking-tighter font-heading text-center bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-xl"
                   >
                     Register now

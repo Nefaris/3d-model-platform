@@ -1,6 +1,10 @@
 import { FC } from 'react';
+import { useAuth } from '../providers/AuthProvider';
+import Link from 'next/link';
 
 const Navbar: FC = () => {
+  const auth = useAuth();
+
   return (
     <section className="text-gray-50 font-heading font-medium relative bg-indigo-700">
       <div className="container mx-auto px-4">
@@ -14,20 +18,39 @@ const Navbar: FC = () => {
                 </svg>
               </button>
               <div className="hidden lg:block w-px h-8 bg-white mx-8 md:ml-14 md:mr-12 bg-opacity-10" />
-              <a href="#">
-                <img className="h-12" src="/uinel-assets/logos/uinel-gray-white.svg" alt="" />
-              </a>
+              <Link href="/">
+                <a>
+                  <img className="h-12" src="/uinel-assets/logos/uinel-gray-white.svg" alt="" />
+                </a>
+              </Link>
             </div>
             <div className="hidden xl:flex items-center">
-              <a className="flex items-center text-white" href="#">
-                <span>Sona</span>
-                <img className="ml-6" src="/uinel-assets/elements/navigations/avatar-online.png" alt="" />
-                <img className="ml-6" src="/uinel-assets/elements/navigations/arrow-down-white.svg" alt="" />
-              </a>
-              <div className="w-px h-8 bg-white mx-9 bg-opacity-20" />
-              <button className="uppercase text-white text-sm font-body font-bold border-2 border-white border-opacity-30 rounded-full py-3 px-5 tracking-wide hover:border-white">
-                <span className="block mt-px">New project</span>
-              </button>
+              {auth.user ? (
+                <a className="flex items-center text-white" href="#">
+                  <span>{auth.user.username}</span>
+                  <img
+                    className="ml-4 rounded-full h-12 w-12 border-2 border-white"
+                    src={`https://avatars.dicebear.com/api/adventurer-neutral/${auth.user.username}.svg`}
+                    alt=""
+                  />
+                </a>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <a className="uppercase text-white text-sm font-body font-bold border-2 border-white border-opacity-30 rounded-full py-3 px-5 tracking-wide hover:border-white">
+                      <span className="block mt-px">Login</span>
+                    </a>
+                  </Link>
+
+                  <div className="w-px h-8 bg-white mx-4 bg-opacity-20" />
+
+                  <Link href="/register">
+                    <a className="uppercase text-white text-sm font-body font-bold border-2 border-white border-opacity-30 rounded-full py-3 px-5 tracking-wide hover:border-white">
+                      <span className="block mt-px">Create account</span>
+                    </a>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
           <button className="navbar-burger self-center xl:hidden focus:outline-none">

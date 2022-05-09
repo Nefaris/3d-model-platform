@@ -1,8 +1,23 @@
+import axios from 'axios';
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 import Layout from '../components/Layout';
 
+const fetchProducts = async (page: number) => {
+  const res = await axios.get(`https://trading-platform-3d.herokuapp.com/api/products?page=${page}`);
+  return res.data;
+};
+
 const Home: NextPage = () => {
+  const [page, setPage] = useState(1);
+  const products = useQuery(['products', { page: page }], () => fetchProducts(page));
+
+  useEffect(() => {
+    console.log(products.data);
+  }, [products.data]);
+
   return (
     <>
       <Layout>
