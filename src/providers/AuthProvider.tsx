@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { LoginResponse, RegisterResponse, User } from '../types/global';
 import { LocalStorageKeys } from '../constants/local-storage-keys.enum';
 import Router from 'next/router';
+import Cookies from 'js-cookie';
 
 const useAuthProviderController = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -42,7 +43,7 @@ const useAuthProviderController = () => {
     return new Promise<void>((resolve, reject) => {
       registerMutation.mutate(formData, {
         onSuccess: (res: RegisterResponse) => {
-          localStorage.setItem(LocalStorageKeys.AUTH_TOKEN, res.accessToken);
+          Cookies.set('authToken', res.accessToken);
           setAuthToken(res.accessToken);
           toast.success('Successfully registered!');
           resolve();
@@ -59,7 +60,7 @@ const useAuthProviderController = () => {
     return new Promise<void>((resolve, reject) => {
       loginMutation.mutate(formData, {
         onSuccess: (res: LoginResponse) => {
-          localStorage.setItem(LocalStorageKeys.AUTH_TOKEN, res.accessToken);
+          Cookies.set('authToken', res.accessToken);
           setAuthToken(res.accessToken);
           toast.success('Successfully logged in!');
           resolve();
@@ -73,7 +74,7 @@ const useAuthProviderController = () => {
   };
 
   const logout = () => {
-    localStorage.removeItem(LocalStorageKeys.AUTH_TOKEN);
+    Cookies.remove('authToken');
     setAuthToken(null);
     setUser(null);
     Router.replace('/');

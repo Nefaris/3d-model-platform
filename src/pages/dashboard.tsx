@@ -1,9 +1,31 @@
-import type { NextPage } from 'next';
+import axios from 'axios';
+import type { InferGetServerSidePropsType, NextPage } from 'next';
 import Layout from '../components/Layout';
 import { useAuth } from '../providers/AuthProvider';
+import { User } from '../types/global';
 
-const Dashboard: NextPage = () => {
-  const { user, logout } = useAuth();
+export async function getServerSideProps(context: any) {
+  const { authToken } = context.req.cookies;
+  if (!authToken) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  const res = await axios.get<User>('https://trading-platform-3d.herokuapp.com/api/users/me/', {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  return { props: { user: res.data } };
+}
+
+const Dashboard: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ user }) => {
+  const { logout } = useAuth();
 
   return (
     <>
