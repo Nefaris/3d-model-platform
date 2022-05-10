@@ -26,14 +26,16 @@ const Navbar: FC = () => {
             </div>
             <div className="hidden xl:flex items-center">
               {auth.user ? (
-                <a className="flex items-center text-white" href="#">
-                  <span>{auth.user.username}</span>
-                  <img
-                    className="ml-4 rounded-full h-12 w-12 border-2 border-white"
-                    src={`https://avatars.dicebear.com/api/adventurer-neutral/${auth.user.username}.svg`}
-                    alt=""
-                  />
-                </a>
+                <Link href="/dashboard">
+                  <a className="flex items-center text-white" href="#">
+                    <span>{auth.user.username}</span>
+                    <img
+                      className="ml-4 rounded-full h-12 w-12 border-2 border-white"
+                      src={`https://avatars.dicebear.com/api/adventurer-neutral/${auth.user.username}.svg`}
+                      alt=""
+                    />
+                  </a>
+                </Link>
               ) : (
                 <>
                   <Link href="/login">

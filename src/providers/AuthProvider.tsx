@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { LoginResponse, RegisterResponse, User } from '../types/global';
 import { LocalStorageKeys } from '../constants/local-storage-keys.enum';
+import Router from 'next/router';
 
 const useAuthProviderController = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -75,6 +76,7 @@ const useAuthProviderController = () => {
     localStorage.removeItem(LocalStorageKeys.AUTH_TOKEN);
     setAuthToken(null);
     setUser(null);
+    Router.replace('/');
   };
 
   return {
