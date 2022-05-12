@@ -7,12 +7,7 @@ import ProductCard from '../components/ProductCard';
 import { Product } from '../types/global';
 
 export async function getServerSideProps() {
-  const res = await axios.get<Product[]>('https://trading-platform-3d.herokuapp.com/api/products?page=1', {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYwNzY5NzM4LCJpYXQiOjE2NTIxMjk3MzgsImp0aSI6ImJiZGY0ZDM3OGQ3YzQyNGNhMTUyOGUyNmFmZTg3N2I0IiwidXNlcl9pZCI6Nn0.XsBmQGTMvgaoAN-kZuOEn6SSIJJStVBmBeNQxzCZoyI`,
-    },
-  });
+  const res = await axios.get<Product[]>('https://trading-platform-3d.herokuapp.com/api/products?page=1');
 
   return {
     props: { initialProducts: res.data },

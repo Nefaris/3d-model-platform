@@ -1,12 +1,12 @@
-import axios from 'axios';
-import type { InferGetServerSidePropsType, NextPage } from 'next';
+import type { InferGetServerSidePropsType, NextPage, NextPageContext } from 'next';
 import Layout from '../components/Layout';
 import { useAuth } from '../providers/AuthProvider';
-import { User } from '../types/global';
+import { getUserFromContext } from '../utils/auth';
 
-export async function getServerSideProps(context: any) {
-  const { authToken } = context.req.cookies;
-  if (!authToken) {
+export async function getServerSideProps(context: NextPageContext) {
+  const user = await getUserFromContext(context);
+
+  if (!user) {
     return {
       redirect: {
         destination: '/login',
@@ -15,13 +15,7 @@ export async function getServerSideProps(context: any) {
     };
   }
 
-  const res = await axios.get<User>('https://trading-platform-3d.herokuapp.com/api/users/me/', {
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-    },
-  });
-
-  return { props: { user: res.data } };
+  return { props: { user } };
 }
 
 const Dashboard: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ user }) => {
@@ -42,16 +36,16 @@ const Dashboard: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>
                 <div className="relative -mt-24 px-4 md:px-9 pb-6 pt-16 mb-8 text-center bg-white rounded-5xl shadow-2xl">
                   <img
                     className="w-24 h-24 rounded-full border-8 border-white mx-auto absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                    src={`https://avatars.dicebear.com/api/adventurer-neutral/${user!.username}.svg`}
+                    src={`https://avatars.dicebear.com/api/adventurer-neutral/${user.username}.svg`}
                     alt=""
                   />
                   <h2 className="text-xl font-heading font-medium leading-10">
-                    {user!.firstName} {user!.lastName}
+                    {user.firstName} {user.lastName}
                   </h2>
-                  <p className="mb-10 text-darkBlueGray-400 font-heading">{user!.username}</p>
+                  <p className="mb-10 text-darkBlueGray-400 font-heading">{user.username}</p>
                   <div className="flex flex-wrap justify-center mb-10">
                     <img className="mr-3" src="uinel-assets/elements/dashboard-content/plane.svg" alt="" />
-                    <p className="text-sm font-heading font-medium tracking-tighter">{user!.email}</p>
+                    <p className="text-sm font-heading font-medium tracking-tighter">{user.email}</p>
                   </div>
                   <div className="w-full sm:mx-auto max-w-sm">
                     <input
