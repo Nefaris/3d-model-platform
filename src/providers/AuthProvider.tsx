@@ -3,7 +3,6 @@ import { useMutation } from 'react-query';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { LoginResponse, RegisterResponse, User } from '../types/global';
-import { LocalStorageKeys } from '../constants/local-storage-keys.enum';
 import Router from 'next/router';
 import Cookies from 'js-cookie';
 
@@ -23,7 +22,7 @@ const useAuthProviderController = () => {
   }, [authToken]);
 
   useEffect(() => {
-    const token = localStorage.getItem(LocalStorageKeys.AUTH_TOKEN);
+    const token = Cookies.get('authToken');
     if (token) {
       setAuthToken(token);
     }
