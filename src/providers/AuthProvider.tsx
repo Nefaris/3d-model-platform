@@ -38,6 +38,11 @@ const useAuthProviderController = () => {
     return res.data;
   });
 
+  const changePasswordMutation = useMutation(async (formData: any) => {
+    const res = await axios.post('https://trading-platform-3d.herokuapp.com/api/users/change-password/', formData);
+    return res.data;
+  });
+
   const register = async (formData: any) => {
     return new Promise<void>((resolve, reject) => {
       registerMutation.mutate(formData, {
@@ -72,6 +77,21 @@ const useAuthProviderController = () => {
     });
   };
 
+  const changePassword = async (formData: any) => {
+    return new Promise<void>((resolve, reject) => {
+      changePasswordMutation.mutate(formData, {
+        onSuccess: () => {
+          toast.success('Password changed successfully');
+          resolve();
+        },
+        onError: () => {
+          toast.error('Something went wrong!');
+          reject();
+        },
+      });
+    });
+  };
+
   const logout = () => {
     Cookies.remove('authToken');
     setAuthToken(null);
@@ -84,6 +104,7 @@ const useAuthProviderController = () => {
     login,
     register,
     logout,
+    changePassword,
   };
 };
 

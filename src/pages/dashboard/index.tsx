@@ -40,9 +40,9 @@ const validationSchema: SchemaOf<ChangePasswordFormInputs> = object({
 });
 
 const Index: NextPage<{ user: User; userModels: Product[] }> = ({ user, userModels }) => {
-  const { logout } = useAuth();
+  const { logout, changePassword } = useAuth();
 
-  const { register, handleSubmit, formState } = useForm<ChangePasswordFormInputs>({
+  const { register, handleSubmit, formState, reset } = useForm<ChangePasswordFormInputs>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       password: '',
@@ -50,7 +50,11 @@ const Index: NextPage<{ user: User; userModels: Product[] }> = ({ user, userMode
   });
 
   const submitHandler = async (formData: ChangePasswordFormInputs) => {
-    console.log(formData);
+    try {
+      await changePassword(formData);
+    } finally {
+      reset();
+    }
   };
 
   return (
@@ -90,6 +94,10 @@ const Index: NextPage<{ user: User; userModels: Product[] }> = ({ user, userMode
                       type="password"
                       placeholder="New password"
                     />
+
+                    {formState.errors.password && (
+                      <p className="text-sm text-red-500 ml-4">{formState.errors.password.message}</p>
+                    )}
 
                     <button
                       type="submit"
