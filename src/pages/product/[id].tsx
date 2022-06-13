@@ -1,22 +1,25 @@
 import { NextPage, NextPageContext } from 'next';
-import Layout from '../../components/Layout';
-import { Product } from '../../types/global';
 import Dinero from 'dinero.js';
 import { useState } from 'react';
 import axios from 'axios';
+import Layout from '../../components/Layout';
+import { Product, User } from '../../types/global';
+import { getUserFromContext } from '../../utils/auth';
+import Link from 'next/link';
 
 export async function getServerSideProps(context: NextPageContext) {
+  const user = await getUserFromContext(context);
   const { id } = context.query;
 
   const res = await fetch(`https://trading-platform-3d.herokuapp.com/api/products/${id}/`);
   const product: Product = await res.json();
 
   return {
-    props: { product },
+    props: { product, user },
   };
 }
 
-const Product: NextPage<{ product: Product }> = ({ product }) => {
+const Product: NextPage<{ product: Product; user: User }> = ({ product, user }) => {
   const [previewImage, setPreviewImage] = useState(product.images[0]);
 
   const handleCheckout = async () => {
@@ -41,13 +44,21 @@ const Product: NextPage<{ product: Product }> = ({ product }) => {
                 </p>
                 <p className="text-lg text-gray-100">{product.description}</p>
 
-                <button
-                  type="button"
-                  className="mt-10 max-w-xs py-5 px-7 w-full text-lg leading-3 text-white font-medium tracking-tighter font-heading text-center bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-xl"
-                  onClick={handleCheckout}
-                >
-                  Buy model
-                </button>
+                {user ? (
+                  <button
+                    type="button"
+                    className="mt-10 max-w-xs py-5 px-7 w-full text-lg leading-3 text-white font-medium tracking-tighter font-heading text-center bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-xl"
+                    onClick={handleCheckout}
+                  >
+                    Buy model
+                  </button>
+                ) : (
+                  <Link href="/login">
+                    <a className="block mt-10 max-w-xs py-5 px-7 w-full text-lg leading-3 text-white font-medium tracking-tighter font-heading text-center bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-xl">
+                      Login to buy model
+                    </a>
+                  </Link>
+                )}
               </div>
             </div>
             <div className="w-full lg:w-1/2 px-4 xl:pl-20 mb-16 lg:mb-0 order-first lg:order-last">
