@@ -8,13 +8,7 @@ import axios from 'axios';
 export async function getServerSideProps(context: NextPageContext) {
   const { id } = context.query;
 
-  const res = await fetch(`https://trading-platform-3d.herokuapp.com/api/products/${id}/`, {
-    headers: {
-      Authorization:
-        'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYzNzcyODc3LCJpYXQiOjE2NTUxMzI4NzcsImp0aSI6IjRhNDQ0Y2Q5NDQzZjQ3ZjliNGIzNmQ0NGEyODg5NGM0IiwidXNlcl9pZCI6Nn0.IwHZlmztnIoz76IyEfZ21h-PdoTKir4PvIBO1Cu5g9I',
-    },
-  });
-
+  const res = await fetch(`https://trading-platform-3d.herokuapp.com/api/products/${id}/`);
   const product: Product = await res.json();
 
   return {
